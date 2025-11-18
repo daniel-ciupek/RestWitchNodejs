@@ -5,6 +5,10 @@ const {
   getRandom,
 } = require("./controllers/quoteController");
 
+const {serveStaticFile} = require("./util/staticServer")
+
+
+
 const PORT = 8080;
 const API_CONTENT_TYPE = { "Content-Type": "application/json" };
 const server = http.createServer(async (req, res) => {
@@ -22,31 +26,30 @@ const server = http.createServer(async (req, res) => {
 
     res.end(JSON.stringify(quotes));
   } else if (req.url.match(/\/api\/quotes\/([0-9]+)/) && req.method === "GET") {
-    const id = req.url.split('/')[3];
+    const id = req.url.split("/")[3];
 
     let quote = await getQuote(id);
-    if(quote) {
-        res.writeHead(200, API_CONTENT_TYPE);
+    if (quote) {
+      res.writeHead(200, API_CONTENT_TYPE);
     } else {
-        res.writeHead(404, API_CONTENT_TYPE);
-        quote = {message : `Quote witch id: ${id} does not exist.`};
+      res.writeHead(404, API_CONTENT_TYPE);
+      quote = { message: `Quote witch id: ${id} does not exist.` };
     }
 
-
-    res.end(JSON.stringify(quote)); 
-
-
-  }
-  else if (req.url === "/api/quotes/random" && req.method === "GET") {
+    res.end(JSON.stringify(quote));
+  } else if (req.url === "/api/quotes/random" && req.method === "GET") {
     let quote = await getRandom();
 
-    if(quote) {
-        res.writeHead(200, API_CONTENT_TYPE);
+    if (quote) {
+      res.writeHead(200, API_CONTENT_TYPE);
     } else {
-        res.writeHead(404, API_CONTENT_TYPE);
-        quote = {message : "Quote not found"};
+      res.writeHead(404, API_CONTENT_TYPE);
+      quote = { message: "Quote not found" };
     }
     res.end(JSON.stringify(quote));
+  }
+  else {
+    serveStaticFile(req, res);
   }
 
   // res.writeHead(200);
